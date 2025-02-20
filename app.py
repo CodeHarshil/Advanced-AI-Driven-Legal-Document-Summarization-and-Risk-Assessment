@@ -13,7 +13,7 @@ llm = ChatGroq(groq_api_key=groq_api_key, model_name="llama-3.3-70b-versatile")
 st.header("Advanced AI-Driven Legal Document Summarization and Risk Assessment")
 
 # Getting text of pdfs
-def get_pdf_text(pdf_docs):
+def getting_text(pdf_docs):
     text=""
     for pdf in pdf_docs:
         pdf_reader= PdfReader(pdf)   # Reading from pdf
@@ -21,7 +21,7 @@ def get_pdf_text(pdf_docs):
             text = text + page.extract_text()
     return text
 
-def get_chunks(text):
+def getting_chunks(text):
     text_splitters = CharacterTextSplitter(separator="\n",chunk_size=500,chunk_overlap=100,length_function=len)
     chunks=text_splitters.split_text(text)
     return chunks
@@ -37,6 +37,15 @@ if user_question:
     input(user_question)
 
 
+# Add helpful instructions
+with st.expander("How to use this chat"):
+    st.markdown("""
+    1. Upload your legal documents using the sidebar
+    2. Click 'Create Chunks' to visualize chunks
+    3. Ask questions about your documents in the chat
+    4. The AI will maintain context throughout the conversation
+    """)
+
 with st.sidebar:
     st.subheader("Your Docs")
     uploaded_files = st.file_uploader("Choose PDF files", accept_multiple_files=True)
@@ -44,10 +53,10 @@ with st.sidebar:
         with st.spinner("Creating chunks..."):
 
             # Get pdf text
-            raw_text=get_pdf_text(uploaded_files)
+            raw_text=getting_text(uploaded_files)
 
             # get the text chunks
-            chunks=get_chunks(raw_text)
+            chunks=getting_chunks(raw_text)
             st.write(chunks)
 
 
