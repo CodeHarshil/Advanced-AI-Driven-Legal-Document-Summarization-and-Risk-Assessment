@@ -17,7 +17,7 @@ st.header("Advanced AI-Driven Legal Document Summarization and Risk Assessment")
 with st.expander("How to use this chat"):
     st.markdown("""
     1. Upload your legal documents using the sidebar
-    2. Click 'Create Chunks' to visualize chunks
+    2. Click 'Generate Summary' to print summary
     3. Ask questions about your documents in the chat
     4. The AI will maintain context throughout the conversation
     """)
@@ -74,13 +74,15 @@ def generate_summary(text):
         st.error(f"Error generating summary")
         return None
 
-def download_summary(summary, num_docs):
+def download_summary(summary):
     summary_dict = {"Document Summary": summary}
-    # Convert the summary_dict to a downloadable string format (e.g., JSON or plain text)
+     
+    # Convert the summary_dict to plain text (multi-line formated string)
     summary_str = f"""
     Document Summary:
     {summary_dict['Document Summary']}
     """
+
     return summary_str
     
 
@@ -88,6 +90,7 @@ with st.sidebar:
     st.subheader("Your Docs")
     uploaded_files = st.file_uploader("Choose PDF files", accept_multiple_files=True)
 
+# Generating Spinners
 if st.button("Generate Summary"):
     with st.spinner("Processing documents..."):
 
@@ -96,7 +99,6 @@ if st.button("Generate Summary"):
 
         # get the text chunks
         chunks=getting_chunks(raw_text)
-        # st.write(chunks)
 
         with st.spinner("Generating summary..."):
             summary = generate_summary(raw_text)
@@ -112,11 +114,7 @@ if st.session_state.summary:
     st.markdown(st.session_state.summary)
     
     # Create download button
-    formatted_summary = download_summary(
-        st.session_state.summary,
-        len(uploaded_files)
-    )
-    
+    formatted_summary = download_summary(st.session_state.summary)    
     st.download_button(
         label="Download Summary",
         data=formatted_summary,
