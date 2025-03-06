@@ -86,7 +86,7 @@ def send_email(recipient_email, subject, body, attachment=None, attachment_name=
         
         # Send message
         send_message = service.users().messages().send(
-            userId='me', 
+            userId= recipient_email, 
             body={'raw': encoded_message}
         ).execute()
         
@@ -129,7 +129,6 @@ def process_pdfs(uploaded_files):
         raw_text = future_text.result()
         chunks = split_text_into_chunks(raw_text)
         st.session_state.vectorstore = create_vectorstore(chunks)
-    print(f"PDF Processing Time: {time.time() - start_time} seconds")
 
 def extract_text_from_pdfs(pdf_docs):
     """Extract text from PDF documents"""
@@ -142,7 +141,7 @@ def extract_text_from_pdfs(pdf_docs):
 
 def split_text_into_chunks(text):
     """Split text into chunks"""
-    text_splitters = CharacterTextSplitter(separator="\n", chunk_size=300, chunk_overlap=50, length_function=len)
+    text_splitters = CharacterTextSplitter(separator="\n", chunk_size=300, chunk_overlap=50)
     return text_splitters.split_text(text)
 
 def create_vectorstore(chunks):
@@ -238,7 +237,6 @@ class IndianRegulatoryInsights:
             st.error(f"Error fetching Indian regulatory insights: {e}")
             return {
                 "error": "Unable to fetch regulatory insights",
-                "timestamp": datetime.now().isoformat()
             }
     def get_legal_resources(self):
         """
@@ -536,22 +534,22 @@ with tab4:
                     st.success(f"Insights from {insights.get('source', 'Indian Government Sources')}")
                     st.write(f"Retrieved at: {insights.get('timestamp')}")
                     
-                    # Display results
-                    for result in insights['results']:
-                        with st.container():
-                            st.markdown(f"### {result.get('title', 'Untitled')}")
-                            st.write(result.get('description', 'No description available'))
+                    # # Display results
+                    # for result in insights['results']:
+                    #     with st.container():
+                    #         st.markdown(f"### {result.get('title', 'Untitled')}")
+                    #         st.write(result.get('description', 'No description available'))
                             
-                            # Display additional metadata
-                            col1, col2 = st.columns(2)
-                            with col1:
-                                st.write(f"**Department:** {result.get('department', 'N/A')}")
-                            with col2:
-                                st.write(f"**Published:** {result.get('published_date', 'N/A')}")
+                    #         # Display additional metadata
+                    #         col1, col2 = st.columns(2)
+                    #         with col1:
+                    #             st.write(f"**Department:** {result.get('department', 'N/A')}")
+                    #         with col2:
+                    #             st.write(f"**Published:** {result.get('published_date', 'N/A')}")
                             
-                            # Source link if available
-                            if result.get('url'):
-                                st.markdown(f"[View Original Source]({result.get('url')})")
+                    #         # Source link if available
+                    #         if result.get('url'):
+                    #             st.markdown(f"[View Original Source]({result.get('url')})")
                 else:
                     st.warning("No insights available for the selected topic.")
         else:
