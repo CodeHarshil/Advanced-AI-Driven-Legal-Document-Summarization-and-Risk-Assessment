@@ -533,23 +533,7 @@ with tab4:
                 if insights and 'results' in insights:
                     st.success(f"Insights from {insights.get('source', 'Indian Government Sources')}")
                     st.write(f"Retrieved at: {insights.get('timestamp')}")
-                    
-                    # # Display results
-                    # for result in insights['results']:
-                    #     with st.container():
-                    #         st.markdown(f"### {result.get('title', 'Untitled')}")
-                    #         st.write(result.get('description', 'No description available'))
-                            
-                    #         # Display additional metadata
-                    #         col1, col2 = st.columns(2)
-                    #         with col1:
-                    #             st.write(f"**Department:** {result.get('department', 'N/A')}")
-                    #         with col2:
-                    #             st.write(f"**Published:** {result.get('published_date', 'N/A')}")
-                            
-                    #         # Source link if available
-                    #         if result.get('url'):
-                    #             st.markdown(f"[View Original Source]({result.get('url')})")
+
                 else:
                     st.warning("No insights available for the selected topic.")
         else:
