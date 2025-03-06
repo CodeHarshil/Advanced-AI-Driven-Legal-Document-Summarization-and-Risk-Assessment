@@ -631,8 +631,3 @@ with tab5:
     
     **Note:** Please make sure your email address is correct before sending any reports.
     """)
-    
-    # Email templates preview
-    with st.expander("Preview Email Template"):
-        st.image("https://via.placeholder.com/800x500?text=Email+Template+Preview", use_column_width=True)
-        st.caption("Example of how your email will appear with section formatting and branding.")
