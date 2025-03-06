@@ -353,8 +353,8 @@ def create_email_html(summary, risk_assessment=None):
         <style>
             body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
             .container {{ max-width: 800px; margin: 0 auto; padding: 20px; }}
-            h1 {{ color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px; }}
-            h2 {{ color: #3498db; margin-top: 20px; }}
+            h1 {{ color: grey; border-bottom: 1px solid #eee; padding-bottom: 10px; }}
+            h2 {{ color: blue; margin-top: 20px; }}
             .footer {{ margin-top: 30px; font-size: 12px; color: #7f8c8d; text-align: center; }}
             .risk-high {{ color: #e74c3c; }}
             .risk-medium {{ color: #f39c12; }}
