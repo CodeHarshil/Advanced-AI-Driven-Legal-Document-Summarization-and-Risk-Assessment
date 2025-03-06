@@ -35,7 +35,8 @@ groq_api_key = os.getenv("GROQ_API_KEY")
 llm = ChatGroq(groq_api_key=groq_api_key, model_name="llama-3.3-70b-versatile")
 
 # Gmail API setup
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+gmail_api_key = os.getenv("GMAIL_API_KEY")
+SCOPES = ['GMAIL_API_KEY']
 
 def get_gmail_service():
     """Create and return Gmail API service"""
