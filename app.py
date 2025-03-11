@@ -20,14 +20,13 @@ import matplotlib.pyplot as plt
 import requests
 import json
 import base64
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import pickle
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+
 
 load_dotenv()
 
@@ -35,68 +34,36 @@ load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
 llm = ChatGroq(groq_api_key=groq_api_key, model_name="llama-3.3-70b-versatile")
 
-# Gmail API setup
-gmail_api_key = os.getenv("GMAIL_API_KEY")
-SCOPES = ['GMAIL_API_KEY']
-
-def get_gmail_service():
-    """Create and return Gmail API service"""
-    creds = None
-    
-    # Check if token.pickle exists
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    
-    # If credentials don't exist or are invalid, get new ones
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=587)
-        
-        # Save credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-    
-    return build('gmail', 'v1', credentials=creds)
-
 def send_email(recipient_email, subject, body, attachment=None, attachment_name=None):
-    """Send email using Gmail API"""
-    try:
-        service = get_gmail_service()
-        
-        # Create message
-        message = MIMEMultipart()
-        message['to'] = recipient_email
-        message['subject'] = subject
-        
-        # Add text body
-        msg_text = MIMEText(body, 'html')
-        message.attach(msg_text)
-        
-        # Add attachment if provided
-        if attachment:
-            attachment_mime = MIMEApplication(attachment.getvalue(), _subtype='pdf')
-            attachment_mime.add_header('Content-Disposition', 'attachment', filename=attachment_name)
-            message.attach(attachment_mime)
-            
-        # Encode message
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        
-        # Send message
-        send_message = service.users().messages().send(
-            userId= recipient_email, 
-            body={'raw': encoded_message}
-        ).execute()
-        
-        return True, f"Email sent successfully. Message ID: {send_message['id']}"
+    sendgrid_api_key = os.getenv("SENDGRID_API_KEY")
+    sender_email = os.getenv("SENDER_EMAIL")
     
+    message = Mail(
+        from_email=sender_email,
+        to_emails=recipient_email,
+        subject=subject,
+        html_content=body
+    )
+    
+    if attachment:
+        attachment.seek(0)
+        pdf_data = attachment.read()
+        encoded_pdf = base64.b64encode(pdf_data).decode()
+        
+        file_attachment = Attachment(
+            FileContent(encoded_pdf),
+            FileName(attachment_name or "Legal_Report.pdf"),
+            FileType("application/pdf"),
+            Disposition("attachment")
+        )
+        message.attachment = file_attachment
+    
+    try:
+        sg = SendGridAPIClient(sendgrid_api_key)
+        response = sg.send(message)
+        return True, f"Email sent successfully. Status code: {response.status_code}"
     except Exception as e:
         return False, f"Error sending email: {str(e)}"
-
 
 st.header("Advanced AI-Driven Legal Document Summarization and Risk Assessment")
 
@@ -348,34 +315,12 @@ def handle_user_question(user_question):
     return response["answer"]
 
 def create_email_text(summary=None, risk_assessment=None):
-    """
-    Create the plain text content for an email based on the summary and risk assessment.
-
-    Parameters:
-    - summary (str): The summary of the document.
-    - risk_assessment (str): The risk assessment of the document.
-
-    Returns:
-    - str: The plain text content for the email.
-    """
-    email_text = "Legal Document Analysis Report\n\n"
-    email_text += "Dear User,\n\n"
-    email_text += "Here is the analysis of your uploaded legal document:\n\n"
-
-    if summary:
-        email_text += "Document Summary:\n"
-        email_text += summary + "\n\n"
-
-    if risk_assessment:
-        email_text += "Risk Assessment:\n"
-        email_text += risk_assessment + "\n\n"
+    email_text = "Der User, This is your Legal Document Analysis Report. \n"
+    email_text += "Please find the E-mail attechment for the analysis of your uploaded legal document:\n\n"
 
     email_text += "This report was generated by AI-Driven Legal Document Analysis System.\n"
-    email_text += "Please review the information with appropriate legal counsel.\n"
-
     return email_text
   
-
 # Add consent mechanism
 st.sidebar.checkbox("I consent to the processing of my data", value=True, key="gdpr_consent")
 
