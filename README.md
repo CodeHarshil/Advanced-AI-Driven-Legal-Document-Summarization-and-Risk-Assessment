@@ -29,7 +29,10 @@ This application allows us to upload multiple PDF documents and chat with them u
 
 ## Technologies Used
 
-- Python for backend processing
-- Streamlit for the user interface
-- Groq and Hugging Face for LLM integration
-- SendGrid for email automation
+- Python for backend processing.
+- Streamlit for the user interface.
+- Groq and Hugging Face for LLM integration.
+- LangChain for Decision making.
+- Sentence Transformer for Embeddings.
+- FAISS as Vector Database.
+- SendGrid for email integration.
